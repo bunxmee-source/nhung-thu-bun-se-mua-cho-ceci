@@ -91,14 +91,13 @@ background:#ff4d4d;
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-import {
-getFirestore,
-collection,
-addDoc,
-onSnapshot,
-deleteDoc,
-doc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { 
+getDatabase,
+ref,
+push,
+onValue,
+remove
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 
 const firebaseConfig = {
@@ -108,25 +107,29 @@ const firebaseConfig = {
   projectId: "shopping-list-ceci",
   storageBucket: "shopping-list-ceci.firebasestorage.app",
   messagingSenderId: "873728604373",
-  appId: "1:873728604373:web:81c7d87a0bdc0e90a70a5c",
-  measurementId: "G-XLG9NE7ZXK"
+  appId: "1:873728604373:web:81c7d87a0bdc0e90a70a5c"
 };
 
+
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const database = getDatabase(app);
+
 
 const input = document.getElementById("input");
 const addBtn = document.getElementById("addBtn");
 const list = document.getElementById("list");
 
 
-addBtn.onclick = async () => {
+const itemsRef = ref(database, "items");
+
+
+addBtn.onclick = () => {
 
 const text = input.value.trim();
 
-if(text==="") return;
+if(text === "") return;
 
-await addDoc(collection(db,"items"),{
+push(itemsRef,{
 name:text
 });
 
@@ -135,33 +138,32 @@ input.value="";
 };
 
 
-onSnapshot(collection(db,"items"), snapshot => {
+onValue(itemsRef,(snapshot)=>{
 
 list.innerHTML="";
 
-snapshot.forEach(docSnap => {
+if(!snapshot.exists()) return;
 
-const data = docSnap.data();
+const data = snapshot.val();
+
+Object.entries(data).forEach(([id,item])=>{
 
 const li = document.createElement("li");
 
 li.innerHTML = `
-${data.name}
-<button class="delete" onclick="deleteItem('${docSnap.id}')">x</button>
+${item.name}
+<button class="delete">x</button>
 `;
+
+li.querySelector("button").onclick = ()=>{
+remove(ref(database,"items/"+id));
+};
 
 list.appendChild(li);
 
 });
 
 });
-
-
-window.deleteItem = async (id) => {
-
-await deleteDoc(doc(db,"items",id));
-
-};
 
 </script>
 
