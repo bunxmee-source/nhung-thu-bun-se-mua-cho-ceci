@@ -96,7 +96,7 @@ color:gray;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyDtFALlVc-PVVL1O5Yt0vtcekOBtwM",
@@ -130,7 +130,37 @@ onSnapshot(collection(db,"items"),(snapshot)=>{
 
 list.innerHTML="";
 
-snapshot.forEach(doc=>{
+snapshot.forEach(d=>{
+
+let li=document.createElement("li");
+
+let text=document.createElement("span");
+text.innerText=d.data().text;
+
+let edit=document.createElement("button");
+edit.innerText="✏";
+
+let del=document.createElement("button");
+del.innerText="❌";
+
+edit.onclick=async ()=>{
+let newText=prompt("Sửa món:",d.data().text);
+if(newText){
+await updateDoc(doc(db,"items",d.id),{text:newText});
+}
+}
+
+del.onclick=async ()=>{
+await deleteDoc(doc(db,"items",d.id));
+}
+
+li.appendChild(text);
+li.appendChild(edit);
+li.appendChild(del);
+
+list.appendChild(li);
+
+});
 
 let li=document.createElement("li");
 
