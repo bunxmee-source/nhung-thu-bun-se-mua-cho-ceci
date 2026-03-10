@@ -1,78 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Ceci Shopping List</title>
+<title>Ceci muốn mua gì?</title>
 
 <style>
 
 body{
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
-background:linear-gradient(135deg,#667eea,#764ba2);
+font-family:Arial;
 height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
 margin:0;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#667eea,#764ba2);
 }
 
-.container{
+.box{
 background:white;
 padding:30px;
-border-radius:20px;
-width:380px;
-box-shadow:0 20px 40px rgba(0,0,0,0.2);
+border-radius:15px;
+width:340px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
 
-h1{
+h2{
 text-align:center;
 margin-bottom:20px;
 }
 
-.input-area{
+.row{
 display:flex;
 gap:10px;
 }
 
 input{
 flex:1;
-padding:12px;
-border-radius:10px;
-border:1px solid #ddd;
-font-size:16px;
+padding:10px;
+border-radius:8px;
+border:1px solid #ccc;
 }
 
 button{
-padding:12px 16px;
+padding:10px 15px;
 border:none;
-border-radius:10px;
+border-radius:8px;
 background:#667eea;
 color:white;
-font-weight:bold;
 cursor:pointer;
-}
-
-button:hover{
-background:#5565d9;
 }
 
 ul{
-list-style:none;
-padding:0;
 margin-top:20px;
+padding:0;
 }
 
 li{
-background:#f7f7fb;
-padding:12px;
-border-radius:10px;
-margin-bottom:10px;
-cursor:pointer;
+list-style:none;
+background:#f3f3f3;
+padding:10px;
+border-radius:8px;
+margin-bottom:8px;
+display:flex;
+justify-content:space-between;
 }
 
-.done{
-text-decoration:line-through;
-color:gray;
+.delete{
+background:#ff4d4d;
 }
 
 </style>
@@ -80,17 +74,13 @@ color:gray;
 
 <body>
 
-<div class="container">
+<div class="box">
 
-  <h1>🛒 Ceci's Shopping List</h1>
+<h2>Ceci muốn mua gì?</h2>
 
-  <div class="input-group">
-    <input id="itemInput" placeholder="Thêm món..." />
-    <button onclick="addItem()">+</button>
-  </div>
-
-  <ul id="list"></ul>
-
+<div class="row">
+<input id="input" placeholder="Nhập món...">
+<button id="addBtn">+</button>
 </div>
 
 <ul id="list"></ul>
@@ -100,83 +90,78 @@ color:gray;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+onSnapshot,
+deleteDoc,
+doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 
 const firebaseConfig = {
-apiKey: "AIzaSyDtFALlVc-PVVL1O5Yt0vtcekOBtwM",
-authDomain: "shopping-list-ceci.firebaseapp.com",
-projectId: "shopping-list-ceci",
-storageBucket: "shopping-list-ceci.firebasestorage.app",
-messagingSenderId: "873728604373",
-appId: "1:873728604373:web:81c7d87a0bdc0e90a70a5c",
-measurementId: "G-XLG9NE7ZXK"
+
+apiKey: "API_KEY",
+authDomain: "PROJECT_ID.firebaseapp.com",
+projectId: "PROJECT_ID",
+storageBucket: "PROJECT_ID.appspot.com",
+messagingSenderId: "ID",
+appId: "APP_ID"
+
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+const input = document.getElementById("input");
+const addBtn = document.getElementById("addBtn");
 const list = document.getElementById("list");
 
-window.addItem = async function(){
 
-const input = document.getElementById("item");
+addBtn.onclick = async () => {
 
-if(input.value.trim()=="") return;
+const text = input.value.trim();
+
+if(text==="") return;
 
 await addDoc(collection(db,"items"),{
-text:input.value
+name:text
 });
 
 input.value="";
-}
 
-onSnapshot(collection(db,"items"),(snapshot)=>{
+};
+
+
+onSnapshot(collection(db,"items"), snapshot => {
 
 list.innerHTML="";
 
-snapshot.forEach(d=>{
+snapshot.forEach(docSnap => {
 
-let li=document.createElement("li");
+const data = docSnap.data();
 
-let text=document.createElement("span");
-text.innerText=d.data().text;
+const li = document.createElement("li");
 
-let edit=document.createElement("button");
-edit.innerText="✏";
-
-let del=document.createElement("button");
-del.innerText="❌";
-
-edit.onclick=async ()=>{
-let newText=prompt("Sửa món:",d.data().text);
-if(newText){
-await updateDoc(doc(db,"items",d.id),{text:newText});
-}
-}
-
-del.onclick=async ()=>{
-await deleteDoc(doc(db,"items",d.id));
-}
-
-li.appendChild(text);
-li.appendChild(edit);
-li.appendChild(del);
+li.innerHTML = `
+${data.name}
+<button class="delete" onclick="deleteItem('${docSnap.id}')">x</button>
+`;
 
 list.appendChild(li);
 
 });
 
-let li=document.createElement("li");
-
-li.innerText=doc.data().text;
-
-li.onclick=function(){
-li.classList.toggle("done");
-}
-
-list.appendChild(li);
-
 });
+
+
+window.deleteItem = async (id) => {
+
+await deleteDoc(doc(db,"items",id));
+
+};
 
 </script>
 
