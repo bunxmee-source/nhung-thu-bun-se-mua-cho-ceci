@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Danh sách ceci muốn mua</title>
+
+<style>
+body{
+font-family: Arial;
+background:#f4f6fb;
+max-width:500px;
+margin:auto;
+padding:20px;
+}
+
+h1{
+text-align:center;
+}
+
+input{
+padding:10px;
+width:70%;
+}
+
+button{
+padding:10px;
+}
+
+li{
+margin:10px 0;
+}
+
+.done{
+text-decoration: line-through;
+color: gray;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>🛒 ceci muốn mua gì?</h1>
+
+<input id="item">
+<button onclick="addItem()">Thêm</button>
+
+<ul id="list"></ul>
+
+<script>
+
+let items=[]
+
+function addItem(){
+
+let input=document.getElementById("item")
+
+let li=document.createElement("li")
+
+li.innerText=input.value
+
+li.onclick=function(){
+li.classList.toggle("done")
+}
+
+document.getElementById("list").appendChild(li)
+
+input.value=""
+
+}
+
+</script>
+
+</body>
+</html>
