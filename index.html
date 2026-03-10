@@ -2,17 +2,17 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Danh sách ceci muốn mua</title>
+<title>Ceci Shopping List</title>
 
 <style>
 
 body{
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-background: linear-gradient(135deg,#667eea,#764ba2);
-min-height:100vh;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+background:linear-gradient(135deg,#667eea,#764ba2);
+height:100vh;
 display:flex;
-justify-content:center;
 align-items:center;
+justify-content:center;
 margin:0;
 }
 
@@ -21,7 +21,7 @@ background:white;
 padding:30px;
 border-radius:20px;
 width:380px;
-box-shadow:0 15px 40px rgba(0,0,0,0.2);
+box-shadow:0 20px 40px rgba(0,0,0,0.2);
 }
 
 h1{
@@ -67,32 +67,15 @@ background:#f7f7fb;
 padding:12px;
 border-radius:10px;
 margin-bottom:10px;
-}
-
-</style>
-h1{
-text-align:center;
-}
-
-input{
-padding:10px;
-width:70%;
-}
-
-button{
-padding:10px;
-}
-
-li{
-margin:10px 0;
+cursor:pointer;
 }
 
 .done{
-text-decoration: line-through;
-color: gray;
+text-decoration:line-through;
+color:gray;
 }
-</style>
 
+</style>
 </head>
 
 <body>
@@ -116,51 +99,54 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDtFALlVc-PVVL1O5Yt0vtcekOBtwM",
-  authDomain: "shopping-list-ceci.firebaseapp.com",
-  projectId: "shopping-list-ceci",
-  storageBucket: "shopping-list-ceci.firebasestorage.app",
-  messagingSenderId: "873728604373",
-  appId: "1:873728604373:web:81c7d87a0bdc0e90a70a5c",
-  measurementId: "G-XLG9NE7ZXK"
+apiKey: "AIzaSyDtFALlVc-PVVL1O5Yt0vtcekOBtwM",
+authDomain: "shopping-list-ceci.firebaseapp.com",
+projectId: "shopping-list-ceci",
+storageBucket: "shopping-list-ceci.firebasestorage.app",
+messagingSenderId: "873728604373",
+appId: "1:873728604373:web:81c7d87a0bdc0e90a70a5c",
+measurementId: "G-XLG9NE7ZXK"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const list = document.getElementById("list")
+const list = document.getElementById("list");
 
 window.addItem = async function(){
 
-const input = document.getElementById("item")
+const input = document.getElementById("item");
 
-if(input.value.trim()=="") return
+if(input.value.trim()=="") return;
 
 await addDoc(collection(db,"items"),{
 text:input.value
-})
+});
 
-input.value=""
-
+input.value="";
 }
 
 onSnapshot(collection(db,"items"),(snapshot)=>{
 
-list.innerHTML=""
+list.innerHTML="";
 
 snapshot.forEach(doc=>{
 
-let li=document.createElement("li")
+let li=document.createElement("li");
 
-li.innerText=doc.data().text
+li.innerText=doc.data().text;
 
-list.appendChild(li)
+li.onclick=function(){
+li.classList.toggle("done");
+}
 
-})
+list.appendChild(li);
 
-})
+});
+
+});
 
 </script>
 
+</body>
 </html>
-
