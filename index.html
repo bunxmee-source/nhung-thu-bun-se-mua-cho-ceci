@@ -47,27 +47,55 @@ color: gray;
 
 <ul id="list"></ul>
 
-<script>
+script type="module">
 
-let items=[]
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-function addItem(){
+const firebaseConfig = {
+  apiKey: "AIzaSyDtFALlVc-PVVL1O5Yt0vtcekOBtwM",
+  authDomain: "shopping-list-ceci.firebaseapp.com",
+  projectId: "shopping-list-ceci",
+  storageBucket: "shopping-list-ceci.firebasestorage.app",
+  messagingSenderId: "873728604373",
+  appId: "1:873728604373:web:81c7d87a0bdc0e90a70a5c",
+  measurementId: "G-XLG9NE7ZXK"
+};
 
-let input=document.getElementById("item")
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-let li=document.createElement("li")
+const list = document.getElementById("list")
 
-li.innerText=input.value
+window.addItem = async function(){
 
-li.onclick=function(){
-li.classList.toggle("done")
-}
+const input = document.getElementById("item")
 
-document.getElementById("list").appendChild(li)
+if(input.value.trim()=="") return
+
+await addDoc(collection(db,"items"),{
+text:input.value
+})
 
 input.value=""
 
 }
+
+onSnapshot(collection(db,"items"),(snapshot)=>{
+
+list.innerHTML=""
+
+snapshot.forEach(doc=>{
+
+let li=document.createElement("li")
+
+li.innerText=doc.data().text
+
+list.appendChild(li)
+
+})
+
+})
 
 </script>
 
